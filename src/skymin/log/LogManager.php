@@ -31,7 +31,7 @@ use function json_decode;
 
 class LogManager extends PluginBase implements Listener{
 	
-	/* Block log Tyoes */
+	/* Block log Types */
 	public const BREAK = 'break';
 	public const PLACE = 'place';
 	public const SIGN = 'sign';
@@ -105,6 +105,17 @@ class LogManager extends PluginBase implements Listener{
 		];
 	}
 	
+	public function getBlocklogData(string $xyz) :?array{
+		$path = $this->getDataFolder() . 'block/' . $xyz;
+		if(file_exists($path . '.json')){
+			if(!isset($this->blockLog[$xyz])){
+				$this->blockLog[$xyz] = ($config = Data::call($path));
+				return $config;
+			}
+		}
+		return null;
+	}
+	
 	public function onBlockPlace(BlockPlaceEvent $event) :void{
 		$player = $event->getPlayer();
 		$block = $event->getBlock();
@@ -150,7 +161,17 @@ class LogManager extends PluginBase implements Listener{
 		$pos = $block->getPosition();
 		if($this->getServer()->isOp($player->getName())){
 			if($ev->getItem() instanceof BlazeRod){
-				//Todo
+				if(isset($this->blockLog[$xyz])){
+					$data = $this->blockLog[$xyz];
+					$str = $data['type'] . ' by ' . $data['player'] . ' on ' . $data['date'];
+					$player->sendMessage('§7' . $str);
+					return;
+				}
+				if(is_array($this->getBlocklogData($xyz))){
+					$data = $this->blockLog[$xyz];
+					$str = $data['type'] . ' by ' . $data['player'] . ' on ' . $data['date'];
+					$player->sendMessage('§7' . $str);
+				}
 			}
 		}
 	}
