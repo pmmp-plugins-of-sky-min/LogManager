@@ -1,5 +1,5 @@
 name: LogManager
 version: SKY
-main: skymin\\log\\LogManager
+main: skymin\log\LogManager
 api: 4.0.0
 author: skymin
